@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CreatePost from "./createPost";
 import Posts from "./posts";
+import Header from "../header/header";
 
 const Feed = () => {
   const [isCreatePostVisible, setIsCreatePostVisible] = useState(false);
@@ -12,6 +13,7 @@ const Feed = () => {
 
   return (
     <div>
+      <Header />
       <h1>Feed</h1>
       <p>Feed content...</p>
       <Posts />

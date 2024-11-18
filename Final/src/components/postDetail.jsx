@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../database';
+import Header from './header/header';
 import './postDetail.css';
 
 const PostDetail = () => {
@@ -90,6 +91,8 @@ const PostDetail = () => {
   }
 
   return (
+    <div>
+    <Header />
     <div className="post-detail-container">
       <h1 className="post-title">{post.caption}</h1>
       <img className="post-image" src={post.image} alt={post.caption} />
@@ -121,6 +124,7 @@ const PostDetail = () => {
         />
         <button onClick={handleAddComment}>Submit Comment</button>
       </div>
+    </div>
     </div>
   );
 };
