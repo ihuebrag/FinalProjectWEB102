@@ -27,3 +27,29 @@ export const login = async (email, password) => {
     return user;
   };
   
+// Example of fetching from Supabase
+export const fetchPost = async () => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('id', postId)
+      .single();
+    
+    if (error) {
+      console.error("Error fetching post:", error.message);
+    } else {
+      setPost(data);
+    }
+  
+    const { data: commentData, error: commentError } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('post_id', postId);
+    
+    if (commentError) {
+      console.error("Error fetching comments:", commentError.message);
+    } else {
+      setComments(commentData);
+    }
+  };
+  

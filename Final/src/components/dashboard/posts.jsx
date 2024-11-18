@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../database';
+import { Link } from 'react-router-dom';
 
 const Post = ({ post }) => {
   const [upvotes, setUpvotes] = useState(post.upvotes);
@@ -45,6 +46,7 @@ const Post = ({ post }) => {
           </button>
           <p style={styles.upvotes}>{upvotes} Upvotes</p>
         </div>
+        <Link to={`/post/${post.id}`}>See details</Link>
       </div>
     </div>
   );
