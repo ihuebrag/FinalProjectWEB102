@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../database';
+import './postDetail.css';
 
 const PostDetail = () => {
   const { postId } = useParams(); // Get postId from the URL
@@ -89,26 +90,28 @@ const PostDetail = () => {
   }
 
   return (
-    <div>
-      <h1>{post.caption}</h1>
-      <img src={post.image} alt={post.caption} width={300} />
-      <p>Upvotes: {post.upvotes}</p>
-      <p>Posted by: {post.user}</p>
-
+    <div className="post-detail-container">
+      <h1 className="post-title">{post.caption}</h1>
+      <img className="post-image" src={post.image} alt={post.caption} />
+      <div className="post-details">
+        <p>Upvotes: {post.upvotes}</p>
+        <p>Posted by: {post.user}</p>
+      </div>
       <h2>Comments</h2>
-      {comments.length === 0 ? (
-        <p>No comments yet!</p>
-      ) : (
-        comments.map(comment => (
-          <div key={comment.id}>
-            <p>{comment.text}</p>
-            <p>Posted by: {comment.user}</p>
-          </div>
-        ))
-      )}
+      <div className="comments-section">
+        {comments.length === 0 ? (
+          <p>No comments yet!</p>
+        ) : (
+          comments.map((comment) => (
+            <div key={comment.id} className="comment">
+              <p className="user-cred">{comment.user}</p>
+              <p>{comment.text}</p>
+            </div>
+          ))
+        )}
+      </div>
 
-      {/* Add Comment Section */}
-      <div>
+      <div className="add-comment">
         <h3>Add a Comment</h3>
         <textarea
           value={newComment}
