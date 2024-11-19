@@ -84,13 +84,15 @@ const Post = ({ post }) => {
 const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState('created_at'); // State for sorting criteria
+
 
   useEffect(() => {
     const fetchPosts = async () => {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .order('id', { ascending: false });
+        .order(sortBy, { ascending: false });
 
       if (error) {
         console.error('Error fetching posts:', error.message);
@@ -101,17 +103,24 @@ const Posts = () => {
     };
 
     fetchPosts();
-  }, []);
+  }, [sortBy]);
 
   if (loading) {
     return <p>Loading posts...</p>;
   }
 
   return (
-    <div style={styles.postsContainer}>
-      {posts.map((post) => (
-        <Post key={post.id} post={post} />
-      ))}
+    <div>
+        {/* Sorting Buttons */}
+      <div>
+        <button onClick={() => setSortBy('created_at')}>Sort by Date</button>
+        <button onClick={() => setSortBy('upvotes')}>Sort by Upvotes</button>
+      </div>
+        <div style={styles.postsContainer}>
+        {posts.map((post) => (
+            <Post key={post.id} post={post} />
+        ))}
+        </div>
     </div>
   );
 };
