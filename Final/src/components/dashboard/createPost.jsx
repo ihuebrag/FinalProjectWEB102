@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../../database';
+import { useEffect } from 'react';
 
 const CreatePost = () => {
   const [image, setImage] = useState('');
@@ -7,6 +8,18 @@ const CreatePost = () => {
   const [user, setUser] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData?.session?.user) {
+        console.error('Error fetching session or user is not logged in:', sessionError?.message);
+        return;
+      }
+      setUser(sessionData.session.user.email); // Get the current user
+    };
+    fetchData();
+}, []); // Only run once on component mount
 
   const handleCreatePost = async () => {
     if (!image || !caption || !user) {
@@ -54,13 +67,6 @@ const CreatePost = () => {
         placeholder="Caption"
         value={caption}
         onChange={(e) => setCaption(e.target.value)}
-        style={styles.input}
-      />
-      <input
-        type="text"
-        placeholder="User"
-        value={user}
-        onChange={(e) => setUser(e.target.value)}
         style={styles.input}
       />
       <button onClick={handleCreatePost} style={styles.button} disabled={loading}>

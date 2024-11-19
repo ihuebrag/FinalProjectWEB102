@@ -15,15 +15,15 @@ const Feed = () => {
     <div>
       <Header />
       <h1>Feed</h1>
-      <p>Feed content...</p>
-      <Posts />
-      
       {/* Show CreatePost form when isCreatePostVisible is true */}
       {isCreatePostVisible && <CreatePost />}
       
       <button onClick={handleCreate}>
         {isCreatePostVisible ? "Close Create Post" : "Create post"}
       </button>
+      <p>Feed content...</p>
+      <Posts />
+
     </div>
   );
 };

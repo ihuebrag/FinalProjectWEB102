@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../database';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Post = ({ post }) => {
   const [upvotes, setUpvotes] = useState(post.upvotes);
+  const navigate = useNavigate();
 
   const handleUpvote = async () => {
     setUpvotes((prev) => prev + 1);
@@ -33,8 +35,36 @@ const Post = ({ post }) => {
     return `${month}/${day}/${year}`;
   }
 
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
+    if (!confirmDelete) return;
+
+    // Delete the post from the database
+    const { error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', post.id);
+
+    if (error) {
+      console.error('Error deleting post:', error.message);
+    } else {
+      console.log('Post deleted');
+      // Optionally redirect to another page after deletion
+      navigate('/dashboard'); // Redirect to home or feed after delete
+    }
+  };
+
+  const handleUpdate = () => {
+    // Redirect to an update page with post ID in URL
+    navigate(`/update-post/${post.id}`);
+  };
+
   return (
     <div style={styles.postContainer}>
+        <div style={styles.buttonContainer}>
+          <button onClick={handleUpdate} style={styles.updateButton}>Update</button>
+          <button onClick={handleDelete} style={styles.deleteButton}>Delete</button>
+        </div>
       <img src={post.image} alt="Post" style={styles.image} />
       <div style={styles.content}>
         <h3 style={styles.caption}>{post.caption}</h3>
@@ -42,9 +72,8 @@ const Post = ({ post }) => {
         <p style={styles.user}>Posted by: {post.user}</p>
         <div style={styles.upvoteContainer}>
           <button onClick={handleUpvote} style={styles.upvoteButton}>
-            👍 Upvote
+            👍 Upvote ({upvotes})
           </button>
-          <p style={styles.upvotes}>{upvotes} Upvotes</p>
         </div>
         <Link to={`/post/${post.id}`}>See details</Link>
       </div>

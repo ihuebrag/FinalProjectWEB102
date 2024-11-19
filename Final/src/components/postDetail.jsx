@@ -9,6 +9,7 @@ const PostDetail = () => {
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState(''); // State for new comment
+  const [upvotes, setUpvotes] = useState(null);
 
 
   useEffect(() => {
@@ -27,6 +28,7 @@ const PostDetail = () => {
         }
   
         setPost(postData); // Update the post state
+        setUpvotes(postData.upvotes); // Set the initial upvotes count
   
         // Fetch comments for this post
         const { data: commentsData, error: commentsError } = await supabase
@@ -84,6 +86,21 @@ const PostDetail = () => {
       console.error('Unexpected error:', error.message);
     }
   };
+
+  const handleUpvote = async () => {
+    setUpvotes((prev) => prev + 1);
+
+    // Update the upvote count in the Supabase database
+    const { error } = await supabase
+      .from('posts')
+      .update({ upvotes: upvotes + 1 })
+      .eq('id', post.id);
+
+    if (error) {
+      console.error('Error updating upvotes:', error.message);
+      setUpvotes((prev) => prev - 1); // Revert on failure
+    }
+  };
   
 
   if (!post) {
@@ -97,7 +114,9 @@ const PostDetail = () => {
       <h1 className="post-title">{post.caption}</h1>
       <img className="post-image" src={post.image} alt={post.caption} />
       <div className="post-details">
-        <p>Upvotes: {post.upvotes}</p>
+        <button onClick={handleUpvote} style={styles.upvoteButton}>
+            👍 Upvote ({post.upvotes})
+        </button>
         <p>Posted by: {post.user}</p>
       </div>
       <h2>Comments</h2>
@@ -127,6 +146,26 @@ const PostDetail = () => {
     </div>
     </div>
   );
+};
+
+const styles = {
+    upvoteContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+      },
+      upvoteButton: {
+        backgroundColor: '#007bff',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '5px',
+        padding: '5px 10px',
+        cursor: 'pointer',
+      },
+      upvotes: {
+        fontSize: '14px',
+        fontWeight: 'bold',
+      },
 };
 
 export default PostDetail;
