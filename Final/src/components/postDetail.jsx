@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../database';
 import Header from './header/header';
+import { useNavigate } from 'react-router-dom';
 import './postDetail.css';
 
 const PostDetail = () => {
@@ -10,6 +11,31 @@ const PostDetail = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState(''); // State for new comment
   const [upvotes, setUpvotes] = useState(null);
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
+    if (!confirmDelete) return;
+
+    // Delete the post from the database
+    const { error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', post.id);
+
+    if (error) {
+      console.error('Error deleting post:', error.message);
+    } else {
+      console.log('Post deleted');
+      // Optionally redirect to another page after deletion
+      navigate('/dashboard'); // Redirect to home or feed after delete
+    }
+  };
+
+  const handleUpdate = () => {
+    // Redirect to an update page with post ID in URL
+    navigate(`/update-post/${post.id}`);
+  };
 
 
   useEffect(() => {
@@ -111,6 +137,10 @@ const PostDetail = () => {
     <div>
     <Header />
     <div className="post-detail-container">
+        <div style={styles.buttonContainer}>
+          <button onClick={handleUpdate} style={styles.updateButton}>Update</button>
+          <button onClick={handleDelete} style={styles.deleteButton}>Delete</button>
+        </div>
       <h1 className="post-title">{post.caption}</h1>
       <img className="post-image" src={post.image} alt={post.caption} />
       <div className="post-details">

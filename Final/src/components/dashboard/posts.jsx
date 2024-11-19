@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../database';
 import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 
 const Post = ({ post }) => {
   const [upvotes, setUpvotes] = useState(post.upvotes);
-  const navigate = useNavigate();
 
   const handleUpvote = async () => {
     setUpvotes((prev) => prev + 1);
@@ -35,36 +33,8 @@ const Post = ({ post }) => {
     return `${month}/${day}/${year}`;
   }
 
-  const handleDelete = async () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
-    if (!confirmDelete) return;
-
-    // Delete the post from the database
-    const { error } = await supabase
-      .from('posts')
-      .delete()
-      .eq('id', post.id);
-
-    if (error) {
-      console.error('Error deleting post:', error.message);
-    } else {
-      console.log('Post deleted');
-      // Optionally redirect to another page after deletion
-      navigate('/dashboard'); // Redirect to home or feed after delete
-    }
-  };
-
-  const handleUpdate = () => {
-    // Redirect to an update page with post ID in URL
-    navigate(`/update-post/${post.id}`);
-  };
-
   return (
     <div style={styles.postContainer}>
-        <div style={styles.buttonContainer}>
-          <button onClick={handleUpdate} style={styles.updateButton}>Update</button>
-          <button onClick={handleDelete} style={styles.deleteButton}>Delete</button>
-        </div>
       <img src={post.image} alt="Post" style={styles.image} />
       <div style={styles.content}>
         <h3 style={styles.caption}>{post.caption}</h3>
@@ -85,6 +55,7 @@ const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState('created_at'); // State for sorting criteria
+  const [searchQuery, setSearchQuery] = useState(''); // State for search query
 
 
   useEffect(() => {
@@ -105,19 +76,33 @@ const Posts = () => {
     fetchPosts();
   }, [sortBy]);
 
+  const filteredPosts = posts.filter((post) =>
+    post.caption.toLowerCase().includes(searchQuery.toLowerCase()) // Case-insensitive search
+  );
+
   if (loading) {
     return <p>Loading posts...</p>;
   }
 
   return (
     <div>
+        {/* Search Input */}
+      <div>
+        <input
+          type="text"
+          placeholder="Search by caption..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} // Update search query on input change
+          style={styles.searchInput}
+        />
+      </div>
         {/* Sorting Buttons */}
       <div>
         <button onClick={() => setSortBy('created_at')}>Sort by Date</button>
         <button onClick={() => setSortBy('upvotes')}>Sort by Upvotes</button>
       </div>
         <div style={styles.postsContainer}>
-        {posts.map((post) => (
+        {filteredPosts.map((post) => (
             <Post key={post.id} post={post} />
         ))}
         </div>
@@ -174,6 +159,15 @@ const styles = {
   upvotes: {
     fontSize: '14px',
     fontWeight: 'bold',
+  },
+  button: {
+    padding: '8px 16px',
+    margin: '5px',
+    cursor: 'pointer',
+    backgroundColor: '#007BFF',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
   },
 };
 
